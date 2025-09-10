@@ -1,0 +1,62 @@
+@import "tailwindcss";
+
+.split {
+  display: flex;
+  height: 95vh;
+}
+
+.split .gutter:hover{
+    background-color: #33a2fd;
+}
+.split > div {
+  overflow: auto;
+}
+
+.split .gutter {
+  background-color: #333;
+  background-repeat: no-repeat;
+  background-position: 50%;
+}
+
+.split .gutter.gutter-horizontal {
+  cursor: col-resize;
+  width: 6px;
+}
+
+.split .gutter.gutter-vertical {
+  cursor: row-resize;
+  height: 6px;
+}
+
+
+code {
+	border-radius: 5px;
+	border-width: 1px;
+	font-family: sans-serif;
+	font-size: 0.75rem;
+	font-weight: 500;
+	line-height: 1rem;
+	padding: 0.125rem;
+	letter-spacing: 1px;
+	white-space: pre-wrap;
+	background-color: hsla(0, 0%, 100%, 0.07);
+	border-color: rgba(247, 250, 255, 0.12);
+	color: rgba(239, 241, 246, 0.75);
+}
+
+
+.example-card pre {
+	background-color: hsla(0, 0%, 100%, 0.1);
+	border-radius: 0.5rem;
+	color: rgba(239, 241, 246, 0.75);
+	font-size: 0.98rem;
+	line-height: 1.25rem;
+	margin-bottom: 1rem;
+	margin-top: 1rem;
+	padding: 1rem;
+	white-space: pre-wrap;
+}
+.example-card pre strong {
+	color: white;
+	font-size: 1rem;
+}

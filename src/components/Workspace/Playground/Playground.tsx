@@ -5,15 +5,18 @@ import { vscodeDark } from "@uiw/codemirror-theme-vscode";
 import { javascript } from "@codemirror/lang-javascript";
 import EditorFooter from "./EditorFooter";
 import axios from "axios";
+import { toast } from "react-toastify";
  
 type Props = {};
 
-const Playground = ({ problem }) => {
+const Playground = ({ problem , setSuccess, setSolved}) => {
+    const [user, setUser] = useState<{ userId: string; name: string, token:string } | null>(null);
+
   const languageMap = {
+  java: "java",
   javascript: "nodejs",
   python: "python3",
   cpp: "cpp17",
-  java: "java",
 };
 
   const headerCode = {
@@ -48,7 +51,7 @@ const Playground = ({ problem }) => {
     return adjustedError;
   };
 
-  const handleSubmit = async (e) => {
+  const handleRun = async (e) => {
     e.preventDefault();
     setError("");
     setOutput("");
@@ -56,16 +59,26 @@ const Playground = ({ problem }) => {
     const driverCode = problem.languages[
       selectedLanguage
     ].handlerFunction.replace(/{{TEST_CASES_COUNT}}/g, testCasesCount);
-    const fullCode =
-      headerCode[selectedLanguage] + userCode + "\n" + driverCode;
+  let fullCode = "";
+
+  if (selectedLanguage === "java") {
+    fullCode = `${headerCode[selectedLanguage]}\n${driverCode}\n${userCode}`;
+  } else {
+    fullCode = `${headerCode[selectedLanguage]}\n${userCode}\n${driverCode}`;
+  }
     const hiddenCodeLinesCount = driverCode.split("\n").length;
     console.log(fullCode);
 
     let stdinIP = "";
     for (const tc of problem?.testCases) {
-      stdinIP += tc.stdin + "\n";
+      stdinIP += tc?.stdin + "\n";
     }
+
     console.log(stdinIP);
+const loadingToastId = toast.loading("Running the code", {
+    position: "top-center",
+    toastId: "loadingToast",
+  });
 
     try {
       const response = await axios.post("/api/execute", {
@@ -74,20 +87,143 @@ const Playground = ({ problem }) => {
         stdin: stdinIP,
       });
       if (response.data.output) {
+        console.log(response);
+        if(response.data.output){
+          setSuccess(true);
+          setSolved(true);
+        }
         setOutput(response.data.output);
+      toast.update(loadingToastId, {
+      render: "Runned Successfully",
+      type: "success",
+      isLoading: false,
+      autoClose: 2000,
+      position: "top-center",
+      theme: "dark",
+    });
         setError("");
       }
     } catch (err) {
+      console.log(err);
       const apiError = err.response?.data?.error || err.message;
       const adjustedError = adjustErrorLineNumbers(
         apiError,
         hiddenCodeLinesCount
       );
       setError(adjustedError);
+       toast.update(loadingToastId, {
+      render: "Some TestCases failed",
+      type: "error",
+      isLoading: false,
+      autoClose: 3000,
+      position: "top-center",
+      theme: "dark",
+    });
+    }
+  };
+
+  const handleSubmit = async (e) => {
+    if(!user){
+  toast.error("Only Login User can submit!", {
+      position: "top-center",
+      autoClose: 2000,
+      theme: "dark",
+    });
+return;
+    }
+    e.preventDefault();
+    setError("");
+    setOutput("");
+    const testCasesCount = problem.testCases.length;
+    const driverCode = problem.languages[
+      selectedLanguage
+    ].handlerFunction.replace(/{{TEST_CASES_COUNT}}/g, testCasesCount);
+  let fullCode = "";
+
+  if (selectedLanguage === "java") {
+    fullCode = `${headerCode[selectedLanguage]}\n${driverCode}\n${userCode}`;
+  } else {
+    fullCode = `${headerCode[selectedLanguage]}\n${userCode}\n${driverCode}`;
+  }
+    const hiddenCodeLinesCount = driverCode.split("\n").length;
+    console.log(fullCode);
+
+    let stdinIP = "";
+    for (const tc of problem?.testCases) {
+      stdinIP += tc?.stdin + "\n";
+    }
+
+    console.log(stdinIP);
+  const loadingToastId = toast.loading("Submitting...", {
+    position: "top-center",
+    toastId: "loadingToast",
+  });
+    try {
+      const response = await axios.post("/api/execute", {
+        code: fullCode,
+        language: languageMap[selectedLanguage] || selectedLanguage,
+        stdin: stdinIP,
+      });
+      if (response.data.output) {
+        console.log(response);
+        if(response.data.output){
+          // setSuccess(true);
+          // setSolved(true);
+        }
+        setOutput(response.data.output);
+
+        setError("");
+        toast.update(loadingToastId, {
+        render: "Sumitted successfully!",
+        type: "success",
+        isLoading: false,
+        autoClose: 2000,
+        position: "top-center",
+        theme: "dark",
+      });
+ try {
+    const resp = await axios.post("/api/submissions", {userId:user?.userId , problemId: problem._id, status:"status", language:selectedLanguage, code:fullCode, runtime:response.data.cpuTime, memory:response.data.memory, difficulty:problem?.difficulty}, {
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
+      },
+    });
+
+    console.log("Submission response:", resp.data);
+    return resp.data;
+  } catch (error: any) {
+    console.log(error)
+    console.error("Error submitting problem:", error.response?.data || error.message);
+  }
+      }
+    } catch (err) {
+      console.log(err);
+      const apiError = err.response?.data?.error || err.message;
+      const adjustedError = adjustErrorLineNumbers(
+        apiError,
+        hiddenCodeLinesCount
+      );
+      setError(adjustedError);
+      toast.update(loadingToastId, {
+      render: " Some Test cases failed",
+      type: "error",
+      isLoading: false,
+      autoClose: 3000,
+      position: "top-center",
+      theme: "dark",
+    });
     }
   };
 
   useEffect(() => {
+     // Access localStorage inside useEffect to avoid SSR errors
+    const token = localStorage.getItem("token");
+    const userData = localStorage.getItem("user"); 
+    if (token && userData) {
+      const parsed = JSON.parse(userData);
+      setUser({ userId: parsed.userId, name: parsed.name, token:token });
+    }
+
     setUserCode(
       (problem.languages[selectedLanguage]?.starterCode || "") + "\n".repeat(7)
     );

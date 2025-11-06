@@ -1,20 +1,43 @@
-// import { auth } from "@/firebase/firebase";
-import React, { useState, useEffect } from "react";
-// import { useSendPasswordResetEmail } from "react-firebase-hooks/auth";
-import { toast } from "react-toastify";
+ import React, { useState, useEffect } from "react";
+ import { toast } from "react-toastify";
+ import axios from "axios";
+
 type ResetPasswordProps = {};
 
 const ResetPassword: React.FC<ResetPasswordProps> = () => {
 	const [email, setEmail] = useState("");
-	// const [sendPasswordResetEmail, sending, error] = useSendPasswordResetEmail(auth);
-	const handleReset = async (e: React.FormEvent<HTMLFormElement>) => {
-		e.preventDefault();
-		// const success = await sendPasswordResetEmail(email);
-		// if (success) {
-		// 	toast.success("Password reset email sent", { position: "top-center", autoClose: 3000, theme: "dark" });
-		// }
-	};
+ 	 const handleReset = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
 
+    if (!email) return alert("Please enter your email");
+
+    const loadingToastId = toast.loading("Sending password reset email...", {
+      position: "top-center",
+      toastId: "loadingToast",
+    });
+
+    try {
+      const { data } = await axios.post("/api/auth/forgotpassword", { email });
+
+      toast.update(loadingToastId, {
+        render: data.message || "Password reset email sent",
+        type: "success",
+        isLoading: false,
+        autoClose: 3000,
+        position: "top-center",
+        theme: "dark",
+      });
+    } catch (error: any) {
+      toast.update(loadingToastId, {
+        render: error.response?.data?.message || "Failed to send reset email",
+        type: "error",
+        isLoading: false,
+        autoClose: 3000,
+        position: "top-center",
+        theme: "dark",
+      });
+    }
+	 }
 	// useEffect(() => {
 	// 	if (error) {
 	// 		alert(error.message);

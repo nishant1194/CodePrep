@@ -33,7 +33,17 @@ export default async function handler(
             message:"Some error in adding problems."
         });
     }
-  } else {
+  } else if (req.method === "DELETE") {
+    try {
+        const problem = await ProblemModel.deleteMany() ;
+        res.status(201).json({ message: "Create item", problem });
+    } catch (error) {
+        console.log("Some error in adding problems" ,error);
+         res.status(500).json({ 
+            message:"Some error in adding problems."
+        });
+    }
+  }  else {
     res.setHeader("Allow", ["GET", "POST"]);
     res.status(405).end(`Method ${req.method} Not Allowed`);
   }

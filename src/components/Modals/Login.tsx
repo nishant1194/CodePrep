@@ -1,10 +1,10 @@
 import { authModalState } from "@/atoms/authModalAtom";
-// import { auth } from "@/firebase/firebase";
 import { useRouter } from "next/router";
 import React, { useEffect, useState } from "react";
-// import { useSignInWithEmailAndPassword } from "react-firebase-hooks/auth";
 import { useSetRecoilState } from "recoil";
 import { toast } from "react-toastify";
+import axios from "axios";
+
 type LoginProps = {};
 
 const Login: React.FC<LoginProps> = () => {
@@ -13,23 +13,47 @@ const Login: React.FC<LoginProps> = () => {
 		setAuthModalState((prev) => ({ ...prev, type }));
 	};
 	const [inputs, setInputs] = useState({ email: "", password: "" });
-	// const [signInWithEmailAndPassword, user, loading, error] = useSignInWithEmailAndPassword(auth);
 	const router = useRouter();
 	const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 		setInputs((prev) => ({ ...prev, [e.target.name]: e.target.value }));
 	};
 
-	const handleLogin = async (e: React.FormEvent<HTMLFormElement>) => {
-		e.preventDefault();
-		if (!inputs.email || !inputs.password) return alert("Please fill all fields");
-		// try {
-		// 	const newUser = await signInWithEmailAndPassword(inputs.email, inputs.password);
-		// 	if (!newUser) return;
-		// 	router.push("/");
-		// } catch (error: any) {
-		// 	toast.error(error.message, { position: "top-center", autoClose: 3000, theme: "dark" });
-		// }
-	};
+
+const handleLogin = async (e: React.FormEvent<HTMLFormElement>) => {
+  e.preventDefault();
+
+  if (!inputs.email || !inputs.password) {
+    return alert("Please fill all fields");
+  }
+
+  try {
+    const { data } = await axios.post("/api/auth/login", {
+      email: inputs.email,
+      password: inputs.password,
+    });
+
+    // Save JWT token in localStorage or cookie
+    localStorage.setItem("token", data.token);
+
+    // Optionally, save user info
+    localStorage.setItem("user", JSON.stringify(data.user));
+
+    toast.success("Logged in successfully!", {
+      position: "top-center",
+      autoClose: 2000,
+      theme: "dark",
+    });
+
+    router.push("/"); // Redirect to homepage
+  } catch (error: any) {
+    toast.error(error.response?.data?.message || "Login failed", {
+      position: "top-center",
+      autoClose: 3000,
+      theme: "dark",
+    });
+  }
+};
+
 
 	// useEffect(() => {
 	// 	if (error) toast.error(error.message, { position: "top-center", autoClose: 3000, theme: "dark" });

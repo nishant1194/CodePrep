@@ -1,11 +1,8 @@
 import React, { useState } from "react";
 import { BsChevronUp } from "react-icons/bs";
 
-type EditorFooterProps = {
-  handleSubmit: () => void;
-};
 
-const EditorFooter: React.FC<EditorFooterProps> = ({ handleSubmit }) => {
+const EditorFooter = ({ handleSubmit }) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   return (
     <div className="flex bg-[rgb(40,40,40)] absolute bottom-0 z-10 w-full">

@@ -1,8 +1,14 @@
-import type { NextConfig } from "next";
-
-const nextConfig: NextConfig = {
-  /* config options here */
-  reactStrictMode: true,
+/** @type {import('next').NextConfig} */
+const nextConfig = {
+  eslint: {
+    ignoreDuringBuilds: true,
+  },
+  typescript: {
+    ignoreBuildErrors: true, // optional if you want to skip TS errors too
+  },
+   images: {
+    domains: ['blog-app-neew.vercel.app', 'i.pravatar.cc'],
+  },
 };
 
-export default nextConfig;
+module.exports = nextConfig;

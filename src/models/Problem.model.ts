@@ -33,7 +33,7 @@ const ProblemSchema = new Schema({
 	problemStatement: { type: String, required: true },
 	examples: [ExampleSchema],
 	testCases: [TestCaseSchema],
-	// ✅ Multi-language support
+	
 	languages: {
 		type: Map,
 		of: LanguageDataSchema, // e.g., { javascript: { starterCode, handlerFunction }, cpp: {...} }

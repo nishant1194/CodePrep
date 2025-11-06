@@ -100,16 +100,6 @@ export default function Index({}: Props) {
       <Topbar />
       <div className="relative overflow-x-auto mx-auto px-6 pb-10">
         <div className="flex flex-col items-center text-sm">
-          {/* Dark / Light Toggle */}
-          {/* <div className="flex justify-end w-full max-w-[700px] my-4">
-            <button
-              onClick={() => setDarkMode(!darkMode)}
-              className="px-4 py-2 rounded-lg border border-gray-400 text-sm hover:opacity-80"
-            >
-              {darkMode ? "Switch to Light Mode 🌞" : "Switch to Dark Mode 🌙"}
-            </button>
-          </div> */}
-
           {/* Filters */}
           <div className="flex flex-wrap gap-4 my-4 w-full max-w-[700px] justify-between">
             <input

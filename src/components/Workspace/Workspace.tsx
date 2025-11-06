@@ -13,13 +13,14 @@ const Workspace = ( {problem} ) => {
     const { width, height } = useWindowSize();
 	const [success, setSuccess] = useState(false);
 	const [solved, setSolved] = useState(false);
+	const [userCode, setUserCodee] = useState();
 
   return (
 
     <Split className='split' minSize={0}>
-			<ProblemDescription problem={problem} _solved={solved} />
+			<ProblemDescription problem={problem} _solved={solved} userCode={userCode}/>
  			<div className='bg-dark-fill-2'>
-				<Playground problem={problem} setSuccess={setSuccess} setSolved={setSolved} />
+				<Playground problem={problem} setSuccess={setSuccess} setSolved={setSolved} setUserCodee={setUserCodee}/>
 				{success && <Confetti gravity={0.3} tweenDuration={4000} width={width - 1} height={height - 1} />}
 			</div>
 		</Split>

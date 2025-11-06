@@ -5,6 +5,7 @@ import { TiStarOutline } from "react-icons/ti";
 import Description from "./Description/Description";
 import MySubmissions from "./MySubmissions/MySubmissions";
 import Solution from "./Solution/Solution";
+import AIChat from "./AIChat/AIChart";
 
 type Example = {
   id: number;
@@ -15,7 +16,7 @@ type Example = {
 };
 
  
-const ProblemDescription = ({problem}) => {
+const ProblemDescription = ({problem , userCode}) => {
 const [tab, setTab] = useState("Description");
   const difficultyClass = {
     Easy: "bg-[rgb(0,184,163)] text-olive",
@@ -36,10 +37,14 @@ const [tab, setTab] = useState("Description");
         <div onClick={ () =>{setTab('Solution')}} className={`bg-${tab === 'Solution'?'[rgb(40,40,40)]':'[rgb(26,26,26)]'} rounded-t-[5px] px-5 py-[10px] text-xs cursor-pointer`}>
           Solution
         </div>
+        <div onClick={ () =>{setTab('AI')}} className={`bg-${tab === 'AI'?'[rgb(40,40,40)]':'[rgb(26,26,26)]'} rounded-t-[5px] px-5 py-[10px] text-xs cursor-pointer`}>
+          AI
+        </div>
       </div>
       {tab === 'Description' &&<Description problem={problem} /> }
       {tab === 'My Submissions' &&<MySubmissions problem={problem} /> }
       {tab === 'Solution' &&<Solution problem={problem} /> }
+      {tab === 'AI' &&<AIChat problem={problem} userCode={userCode} /> }
 
      
     </div>

@@ -9,7 +9,7 @@ import { toast } from "react-toastify";
  
 type Props = {};
 
-const Playground = ({ problem , setSuccess, setSolved}) => {
+const Playground = ({ problem , setSuccess, setSolved, setUserCodee}) => {
     const [user, setUser] = useState<{ userId: string; name: string, token:string } | null>(null);
 
   const languageMap = {
@@ -231,6 +231,7 @@ return;
 
   const onChange = (value: string) => {
     setUserCode(value);
+    setUserCodee(value)
   };
 
   return (
